@@ -1,0 +1,3 @@
+[submodule "common-js"]
+	path = common-js
+	url = git@github.com:wafagames/common-js.git
