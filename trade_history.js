@@ -10,6 +10,9 @@ require("./common-js/common/csv.js");
 
 
 var arg1=process.argv[2];
+var limit=process.argv[3];
+if(!limit)
+    limit=0.1;
 
 var csvArr=ccsp.csv.readCSV(arg1,"\n");
 var max=0;
@@ -27,7 +30,7 @@ for(var i=1,m=csvArr.length;i<m;i++){
         maxIndex=i;
     }
 
-    if(rate>=0.012)
+    if(rate>=limit)
         cc.log("%s %f %f",ccsp.time.getTimeStrFromTime(time),rate,amount);
 }
 

@@ -37,7 +37,7 @@ bws.on('auth',()=>{
     cc.log("opne ok,begin to get wallet info");
     fund.walletMgr.getWalletInfo();
     send1();
-    bws.subscribeTrades(['fBTC']);
+    // bws.subscribeTrades(['fBTC']);
 });
 
 bws.on('open',()=>{
@@ -53,18 +53,32 @@ bws.on('orderbook', (pair, book) => {
     cc.log('Order book:', book)
 });
 
-bws.on('trade', (pair, tradeArr) => {
-    var info=util.calculateAvaragePrice(tradeArr);
-    var price=ccsp.float.getfloat(info[0],8);
-    var amount=ccsp.float.getfloat(info[1],8);
-    cc.log('trade %s: %08f %08f %d',pair,price,amount,info[2]);
+bws.on('trade', (pair, tradeInfo) => {
+    var type=typeof tradeInfo;
+    if(tradeInfo.length){
+        var info=util.calculateAvarageRate(tradeInfo);
+        var price=ccsp.float.getfloat(info[0],8);
+        var amount=ccsp.float.getfloat(info[1],8);
+        cc.log('fund booking avarage rate info %s %f %08f %d',pair,price,amount,info[2]);
+        return;
+    }
+
+
+    //funding trade history
+    var currency=pair.substr(1,3).toLowerCase();
+    var time=tradeInfo.MTS[1];
+    var amount=Math.abs(tradeInfo.MTS[2]);
+    var rate=tradeInfo.MTS[3];
+    var day=tradeInfo.MTS[4];
+    cc.log('fund booking history %s: %s %f %f %d',currency,ccsp.time.getTimeStrFromTimeMS(time),
+        amount,rate,day);
 });
 
 bws.on('orderbook', (pair, tradeArr) => {
     var info=util.calculateAvaragePrice(tradeArr);
     var price=ccsp.float.getfloat(info[0],8);
     var amount=ccsp.float.getfloat(info[1],8);
-    cc.log('trade %s: %08f %08f %d',pair,price,amount,info[2]);
+    cc.log('orderbook current %s: %08f %08f %d',pair,price,amount,info[2]);
 });
 
 bws.on('ticker', (pair, ticker) => {
@@ -114,11 +128,19 @@ bws.on('bu', (v) => {
 });
 bws.on('fos', (v) => {
     cc.log("fos");
+    cc.log("funding my order current lis:");
     fund.orderMgr.init(v);
     fund.orderMgr.printAll();
 });
 
 bws.on('fte', (v) => {
+    //my funding order taken
+    var id=v[0];
+    var currency=v[1];  'fBTC'
+    var time=v[2];
+    var amount=v[4];
+    var rate=v[5];
+    var day=v[6];
     cc.log("fte");
 });
 bws.on('ftu', (v) => {
