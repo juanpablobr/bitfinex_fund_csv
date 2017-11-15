@@ -1,5 +1,6 @@
 *.csv
 node_modules
 res/config/apikey.json
+res/config/server.json
 .idea
 .D*
