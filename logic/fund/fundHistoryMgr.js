@@ -49,7 +49,7 @@ class fundHistoryMgr{
         this.resortData(currency);
 
         view.insert(json,true).then(newID=>{
-            cc.log("fundHistoryMgr:%s %d inset fund trade rate %f amount %f ok,resort ok",currency,id,rate,amount);
+            // cc.log("fundHistoryMgr:%s %d inset fund trade rate %f amount %f ok,resort ok",currency,id,rate,amount);
             cb?cb():null;
         });
     }
@@ -58,6 +58,16 @@ class fundHistoryMgr{
         var curTime=ccsp.time.getTimeMS();
         var begin=curTime-24*3600*1000;
         return this.getView(currency).dumpByScore(begin,curTime);
+    }
+
+    cleanOldData(){
+        var time=ccsp.time.getTimeMS()-24*3600*1000;
+        for(var i in this._viewList){
+            this._viewList[i].delByConditionStr("time<"+time).then(deleted=>{
+                cc.log("fundHistoryMgr:cleanOldData ok %s total %d deleted",i,deleted);
+            });
+        }
+
     }
 }
 

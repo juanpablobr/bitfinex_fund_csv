@@ -10,7 +10,6 @@ require("./common-js/server/global.js");
 require("./common-js/common/csv.js");
 
 require("./logic/util/util.js");
-require("./logic/dataListModel.js");
 
 require("./logic/fund/fundHistoryMgr.js");
 require("./logic/fund/order.js");
@@ -18,16 +17,18 @@ require("./logic/fund/orderMgr.js");
 require("./logic/fund/wallet.js");
 require("./logic/fund/walletMgr.js");
 
+require("./logic/routine.js");
+
 config.apikey=ccsp.config.getFromJson("res/config/apikey.json");
 config.server=ccsp.config.getFromJson("res/config/server.json");
-g_redis = new ccsp.redis(config.server.redis.host, config.server.redis.port);
-g_redis.onReady(function () {
-    cc.log("g_redis connection ok");
-});
-g_redis.onError(function (err) {
-    cc.logErr("g_redis error!" + err);
-    g_fundHistoryMgr=new fund.fundHistoryMgr();
-});
+// g_redis = new ccsp.redis(config.server.redis.host, config.server.redis.port);
+// g_redis.onReady(function () {
+//     cc.log("g_redis connection ok");
+// });
+// g_redis.onError(function (err) {
+//     cc.logErr("g_redis error!" + err);
+//     g_fundHistoryMgr=new fund.fundHistoryMgr();
+// });
 
 g_db = new ccsp.mysql_es6(
     config.server.db.host, config.server.db.port, config.server.db.user,
@@ -57,6 +58,8 @@ var monitorFundTrade=function (currency) {
 
 
 var main=function () {
+    logic.routine.start();
+
     bws.on('auth',()=>{
         cc.log("authenticated successful!");
         cc.log("opne ok,begin to get wallet info");
@@ -92,8 +95,8 @@ var main=function () {
                 var rate=trade.RATE;
                 var day=trade.PERIOD;
                 g_fundHistoryMgr.insert(currency,id,rate,amount,day,time);
-                cc.log('fund booking history:insert %s %d %s %f %f %d',currency,id,ccsp.time.getTimeStrFromTimeMS(time),
-                    amount,rate,day);
+                // cc.log('fund booking history:insert %s %d %s %f %f %d',currency,id,ccsp.time.getTimeStrFromTimeMS(time),
+                //     amount,rate,day);
             }
             return;
         }
@@ -105,8 +108,8 @@ var main=function () {
         var rate=tradeInfo.MTS[3];
         var day=tradeInfo.MTS[4];
         g_fundHistoryMgr.insert(currency,id,rate,amount,day,time);
-        cc.log('fund booking history:insert %s %d %s %f %f %d',currency,id,ccsp.time.getTimeStrFromTimeMS(time),
-            amount,rate,day);
+        // cc.log('fund booking history:insert %s %d %s %f %f %d',currency,id,ccsp.time.getTimeStrFromTimeMS(time),
+        //     amount,rate,day);
     });
 
     bws.on('orderbook', (pair, tradeArr) => {
