@@ -63,9 +63,11 @@ class fundHistoryMgr{
     cleanOldData(){
         var time=ccsp.time.getTimeMS()-24*3600*1000;
         for(var i in this._viewList){
-            this._viewList[i].delByConditionStr("time<"+time).then(deleted=>{
-                cc.log("fundHistoryMgr:cleanOldData ok %s total %d deleted",i,deleted);
-            });
+            this._viewList[i].delByConditionStr("time<"+time).then(
+            function (deleted) {
+                cc.log("fundHistoryMgr:cleanOldData ok %s total %d deleted",this,deleted);
+            }.bind(i)
+            );
         }
 
     }

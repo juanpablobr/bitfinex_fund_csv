@@ -21,7 +21,7 @@ logic.routine={
             if(loop++%10==0)
                 this.doEvery10SecJob();
 
-            if(loop%20==0)
+            if(loop%60==0)
                 this.doEvery60SecJob();
 
 
