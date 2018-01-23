@@ -21,13 +21,22 @@ require("./logic/fund/walletMgr.js");
 
 require("./logic/routine.js");
 
+var initFiat=parseFloat(process.argv[2]);
+var priceBuy=parseFloat(process.argv[3]);
+var priceSell=parseFloat(process.argv[4]);
+
+if(!initFiat)
+    initFiat=10000;
+if(!priceBuy)
+    priceBuy=108000;
+if(!priceSell)
+    priceSell=6635;
+
 var rate=17.2587;       //1rmb can get this foreign dollar
 var rateDiscount=0.98;
-var priceBuy=109000;
-var priceSell=6635;
 var transFee=0.01;
 
-var initFiat=10000;
+
 var innerFiatName="rmb";
 var outFiatName="jpy";
 var crypotoName="eth";
@@ -42,16 +51,8 @@ cc.log("invest money %f%s get %d%s,buy count %f%s sell %f%s profit %f%s %f",init
     boughtCount,crypotoName,sellFiat,innerFiatName,profit,innerFiatName,profitRate);
 
 
-// var initBtc=parseFloat(process.argv[2]);
-// var rate=parseFloat(process.argv[3]);
-// var maxDay=parseFloat(process.argv[4]);
-//
-// if(!initBtc)
-//     initBtc=400;
-// if(!rate)
-//     rate=0.02;
-// if(!maxDay)
-//     maxDay=365;
+
+
 // var dayRate=0.85*rate/100;
 // var total=initBtc;
 // var timeBegin=ccsp.time.getTime();
