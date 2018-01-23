@@ -43,4 +43,13 @@ util={
         return [price/loop,amount,loop];
     },
 
+    monitorFundTrade:function (currency) {
+        var p={
+            event: "subscribe",
+            channel: "trades",
+            symbol: currency.toUpperCase()
+        };
+        g_bws.send(p);
+    },
+
 };

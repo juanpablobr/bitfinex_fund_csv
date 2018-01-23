@@ -46,14 +46,7 @@ const BFX = require('bitfinex-api-node');
 let bws=new BFX(config.apikey.key,config.apikey.secret,{version:2,transform:true}).ws;
 g_bws=bws;
 
-var monitorFundTrade=function (currency) {
-    var p={
-            event: "subscribe",
-            channel: "trades",
-            symbol: currency.toUpperCase()
-    };
-    g_bws.send(p);
-};
+
 
 
 
@@ -72,8 +65,9 @@ var main=function () {
         cc.log("open ok,begin to auth");
         bws.auth();
         for(var i in g_currency_array){
-            monitorFundTrade(g_currency_array[i]);
+            util.monitorFundTrade(g_currency_array[i]);
         }
+        // g_fundHistoryMgr.cleanOldData();
     });
 
     bws.on('subscribed', (v) => {
@@ -183,6 +177,24 @@ var main=function () {
     });
     bws.on('ftu', (v) => {
         cc.log("ftu");
+    });
+    bws.on('fcs', (v) => {
+        //自己的出借列表，对方使用了
+        cc.log("fcs");
+    });
+    bws.on('fls', (v) => {
+        //自己的出借列表，对方没有使用
+        cc.log("fls");
+    });
+    bws.on('fon', (v) => {
+        cc.log("fon");
+    });
+    bws.on('fou', (v) => {
+        cc.log("fou");
+    });
+    bws.on('foc', (v) => {
+        //单子被人借走
+        cc.log("foc");
     });
     bws.on('hfos', (v) => {
         cc.log("hfos");

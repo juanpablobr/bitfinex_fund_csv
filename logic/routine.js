@@ -39,7 +39,7 @@ logic.routine={
 
     //每60秒都会做的事情
     doEvery60SecJob:function () {
-        g_fundHistoryMgr.cleanOldData();
+        // g_fundHistoryMgr.cleanOldData();
     },
 
     //每10秒都会做的事情
