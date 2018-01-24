@@ -18,6 +18,7 @@ require("./logic/fund/wallet.js");
 require("./logic/fund/walletMgr.js");
 
 require("./logic/routine.js");
+require("./config.js");
 
 config.apikey=ccsp.config.getFromJson("res/config/apikey.json");
 config.server=ccsp.config.getFromJson("res/config/server.json");
@@ -40,7 +41,6 @@ g_db.test_connection().then(() => cc.log("g_db test ok"), err => {
     process.exit(-1);
 });
 
-g_currency_array=["eos","btc","eth","usd"];
 
 const BFX = require('bitfinex-api-node');
 let bws=new BFX(config.apikey.key,config.apikey.secret,{version:2,transform:true}).ws;
