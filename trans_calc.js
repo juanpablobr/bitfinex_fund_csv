@@ -26,22 +26,22 @@ var priceBuy=parseFloat(process.argv[3]);
 var priceSell=parseFloat(process.argv[4]);
 
 if(!initFiat)
-    initFiat=10000;
+    initFiat=100000;
 if(!priceBuy)
     priceBuy=108000;
 if(!priceSell)
     priceSell=6635;
 
-var rate=17.2587;       //1rmb can get this foreign dollar
-var rateDiscount=0.98;
+var rate=5.78;       //1rmb can get this foreign dollar
+var rateFee=0.2;
 var transFee=0.01;
-
+rate=100/(rate+rateFee);
 
 var innerFiatName="rmb";
 var outFiatName="jpy";
 var crypotoName="eth";
 
-var foreignFiat=initFiat*rate*rateDiscount;
+var foreignFiat=initFiat*rate;
 var boughtCount=foreignFiat/priceBuy;
 var sellFiat=(boughtCount-transFee)*priceSell;
 var profit=Math.floor(sellFiat-initFiat);

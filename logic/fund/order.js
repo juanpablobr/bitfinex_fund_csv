@@ -13,7 +13,11 @@ class order{
 
     toString(){
         var timeStr=ccsp.time.getTimeStrFromTimeMS(this.time);
-        return ccsp.string.sprintf("%s %d %s %f %f %d",timeStr,this.id,this.currency,this.amount,this.rate,this.day);
+        if(this.rate)
+            var rate=String(this.rate);
+        else
+            var rate="FRR";
+        return ccsp.string.sprintf("%s %d %s %f %s %d",timeStr,this.id,this.currency,this.amount,rate,this.day);
     }
 }
 
