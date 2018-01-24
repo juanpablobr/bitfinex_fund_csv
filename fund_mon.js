@@ -22,14 +22,6 @@ require("./config.js");
 
 config.apikey=ccsp.config.getFromJson("res/config/apikey.json");
 config.server=ccsp.config.getFromJson("res/config/server.json");
-// g_redis = new ccsp.redis(config.server.redis.host, config.server.redis.port);
-// g_redis.onReady(function () {
-//     cc.log("g_redis connection ok");
-// });
-// g_redis.onError(function (err) {
-//     cc.logErr("g_redis error!" + err);
-//     g_fundHistoryMgr=new fund.fundHistoryMgr();
-// });
 
 g_db = new ccsp.mysql_es6(
     config.server.db.host, config.server.db.port, config.server.db.user,
@@ -51,11 +43,12 @@ g_bws=bws;
 
 
 var main=function () {
+    fund.walletMgr.init();
     logic.routine.start();
 
     bws.on('auth',()=>{
         cc.log("authenticated successful!");
-        cc.log("opne ok,begin to get wallet info");
+        cc.log("auth ok,begin to get wallet info");
         fund.walletMgr.getWalletInfo();
 
         // bws.subscribeTrades(['fBTC']);

@@ -14,7 +14,7 @@ class order{
     toString(){
         var timeStr=ccsp.time.getTimeStrFromTimeMS(this.time);
         if(this.rate)
-            var rate=String(this.rate);
+            var rate=String(this.rate*100);
         else
             var rate="FRR";
         return ccsp.string.sprintf("%s %d %s %f %s %d",timeStr,this.id,this.currency,this.amount,rate,this.day);
