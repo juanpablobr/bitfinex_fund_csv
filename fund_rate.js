@@ -35,8 +35,8 @@ g_db.test_connection().then(() => cc.log("g_db test ok"), err => {
 });
 
 
-var rate=parseFloat(process.argv[2]);
-var currency=process.argv[3];
+var currency=process.argv[2];
+var rate=parseFloat(process.argv[3]);
 var day=parseFloat(process.argv[4]);
 
 
