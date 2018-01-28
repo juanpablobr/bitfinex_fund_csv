@@ -67,6 +67,20 @@ class fundHistoryMgr{
         return ccsp.arrayMgr.get_greater_equal(data,"rate",rate/100);
     }
 
+    getTopRate(currency,max){
+        if(!max)
+            max=3;
+        var day=1;
+        //var data=this.getView(currency).dump();
+        var curTime=ccsp.time.getTimeMS();
+        var begin=curTime-24*3600*day*1000;
+        var data=this.getView(currency).dumpGreaterEqual("time",begin);
+        var ret=[];
+        for(let i=0;i<max;i++)
+            ret.push(data[i]);
+        return ret;
+    }
+
     cleanOldData(day,cb){
         if(!day)
             day=7;

@@ -32,8 +32,8 @@ if(!priceBuy)
 if(!priceSell)
     priceSell=6635;
 
-var rate=5.78;       //1rmb can get this foreign dollar
-var rateFee=0.2;
+var rate=5.82;       //1rmb can get this foreign dollar
+var rateFee=0.1;
 var transFee=0.01;
 rate=100/(rate+rateFee);
 
