@@ -33,7 +33,8 @@ if(!priceSell)
     priceSell=6635;
 
 var rate=5.82;       //1rmb can get this foreign dollar
-var rateFee=0.1;
+var rateFee=0;
+var rateLoss=0.01;
 var transFee=0.01;
 rate=100/(rate+rateFee);
 
@@ -42,6 +43,9 @@ var outFiatName="jpy";
 var crypotoName="eth";
 
 var foreignFiat=initFiat*rate;
+
+var foreignFiat=initFiat*rate*(1-rateLoss);
+
 var boughtCount=foreignFiat/priceBuy;
 var sellFiat=(boughtCount-transFee)*priceSell;
 var profit=Math.floor(sellFiat-initFiat);
