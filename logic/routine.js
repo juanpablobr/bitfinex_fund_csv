@@ -24,6 +24,8 @@ logic.routine={
             if(loop%60==0)
                 this.doEvery60SecJob();
 
+            if(loop%3660==0)
+                this.doEveryHourJob();
 
         }.bind(this),"logic.routine.1",1);
     },
@@ -35,6 +37,12 @@ logic.routine={
     //在固定时间做的事情
     doFixedTimeJob:function(){
         cc.log("logic.routine.doFixedTimeJob:begin!");
+    },
+
+    doEveryHourJob:function () {
+        // g_fundHistoryMgr.cleanOldData();
+        cc.log("doEveryHourJob:begin to exit");
+        process.exit(0);
     },
 
     //每60秒都会做的事情

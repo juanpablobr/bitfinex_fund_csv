@@ -161,7 +161,7 @@ var main=function () {
     bws.on('fte', (v) => {
         //my funding order taken
         var id=v[0];
-        var currency=v[1];  'fBTC'
+        var currency=v[1];  //'fBTC'
         var time=v[2];
         var amount=v[4];
         var rate=v[5];
