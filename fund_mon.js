@@ -67,9 +67,9 @@ var main=function () {
         cc.log('subscribed %j',v)
     });
 
-    bws.on('orderbook', (pair, book) => {
-        cc.log('Order book:', book)
-    });
+    // bws.on('orderbook', (pair, book) => {
+    //     cc.log('Order book:', book)
+    // });
 
     bws.on('trade', (pair, tradeInfo) => {
         var currency=pair.substr(1,3).toLowerCase();
