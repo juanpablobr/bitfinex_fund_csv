@@ -72,7 +72,7 @@ fund.listMgr={
         var profit=0;
         for(var i in infoArr){
             var info=infoArr[i];
-            var dayProfit=info.rate*info.amount/100;
+            var dayProfit=info.rate*info.amount*0.85/100;
             profit+=dayProfit;
             if(!verbos)
                 cc.log("id %s %s rate %f amount %f expire in %s",info.id,currency,
@@ -92,9 +92,29 @@ fund.listMgr={
         cc.log("profit is %f/day predict %f/month %f/year\n",profit,profit*30,profit*30*12);
     },
 
+    getDayProfit:function (currency) {
+        var infoArr=this._order_list[currency];
+        if(!infoArr){
+            return 0;
+        }
+        var profit=0;
+        for(var i in infoArr){
+            var info=infoArr[i];
+            var dayProfit=info.rate*info.amount*0.85/100;
+            profit+=dayProfit;
+        }
+        return profit;
+    },
+
     printAll:function (sortKey,verbos) {
+        var profitInfo={};
         for(var currency in this._order_list){
             this.printCurrency(currency,sortKey,verbos);
+            profitInfo[currency]=this.getDayProfit(currency);
+        }
+        for(var currency in profitInfo){
+            var profit=profitInfo[currency];
+            cc.log("%s profit is %f/day predict %f/month %f/year\n",currency,profit,profit*30,profit*30*12);
         }
     }
 };
