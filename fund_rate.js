@@ -39,7 +39,8 @@ var currency=process.argv[2];
 var rate=parseFloat(process.argv[3]);
 var day=parseFloat(process.argv[4]);
 
-
+if(!currency)
+    currency="btc";
 if(!rate)
     rate=0.02;
 if(!day)
@@ -72,4 +73,4 @@ var main=function () {
     process.exit(0);
 };
 
-g_fundHistoryMgr=new fund.fundHistoryMgr(g_currency_array,main);
+g_fundHistoryMgr=new fund.fundHistoryMgr([currency],main);
