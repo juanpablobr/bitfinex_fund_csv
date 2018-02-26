@@ -32,7 +32,7 @@ g_bws=bws;
 var currency=process.argv[2];
 var sortKey=process.argv[3];
 var verbos=process.argv[4];
-if(verbos==="-v")
+if(verbos==="-v" || sortKey==="-v")
     verbos=true;
 else
     verbos=false;
