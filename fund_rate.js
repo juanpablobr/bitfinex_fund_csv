@@ -53,7 +53,14 @@ var printInfo=function (c,day,rate) {
     if(!lineData || !lineData.length) {
         lineData = g_fundHistoryMgr.getTopRate(c, 3,day);
         cc.log("cannot find give rate in db,return top 3 in last 24hours");
+
+        if(!lineData || !lineData.length) {
+            lineData = g_fundHistoryMgr.getTopRate(c, 3,day);
+            cc.log("cannot find any data");
+        }
+        return;
     }
+
     for(var j in lineData){
         var data=lineData[j];
         cc.log("%s %s rate %f amount %d day %d",ccsp.time.getTimeStrFromTimeMS(data.time),c,

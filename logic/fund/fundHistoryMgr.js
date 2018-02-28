@@ -76,8 +76,11 @@ class fundHistoryMgr{
         var begin=curTime-24*3600*day*1000;
         var data=this.getView(currency).dumpGreaterEqual("time",begin);
         var ret=[];
-        for(let i=0;i<max;i++)
+        for(let i=0;i<max;i++){
+            if(!data[i])
+                break;
             ret.push(data[i]);
+        }
         return ret;
     }
 
