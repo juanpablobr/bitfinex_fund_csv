@@ -53,12 +53,10 @@ var printInfo=function (c,day,rate) {
     if(!lineData || !lineData.length) {
         lineData = g_fundHistoryMgr.getTopRate(c, 3,day);
         cc.log("cannot find give rate in db,return top 3 in last 24hours");
-
         if(!lineData || !lineData.length) {
-            lineData = g_fundHistoryMgr.getTopRate(c, 3,day);
             cc.log("cannot find any data");
+            return;
         }
-        return;
     }
 
     for(var j in lineData){
