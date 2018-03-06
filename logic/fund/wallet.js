@@ -8,11 +8,14 @@ class wallet{
         this.type=type;
         this.amount=0;
         this.free=0;
-        if(dataArr)
-            this.onUpdate(dataArr);
+        if(dataArr){
+           var funcName="onUpdate"+ccsp.string.capitalize(this.type);
+           this[funcName](dataArr);
+        }
+
     }
 
-    onUpdate(dataArr){
+    onUpdateFunding(dataArr){
         for(let i=0,m=dataArr.length;i<m;i++){
             let data=dataArr[i];
             if(data[0]!==this.type)
@@ -23,8 +26,21 @@ class wallet{
             let amount=data[2];
             if(amount){
                 this.amount=amount;
-                cc.log("wallet:onUpdate %s %f",currency,amount);
+                cc.log("bitfinex found wallet:onUpdate %s %f",currency,amount);
             }
+        }
+    }
+
+    onUpdateBinance(dataArr){
+        for(let i=0,m=dataArr.length;i<m;i++){
+            let data=dataArr[i];
+            let currency=data.asset.toLowerCase();
+            if(currency!=this.currency)
+                continue;
+            let amount=parseFloat(data.free)+parseFloat(data.locked);
+            this.amount=amount;
+            cc.log("binance wallet: %s %f",currency,amount);
+            break;
         }
     }
 
@@ -37,7 +53,7 @@ class wallet{
             return;
         this.amount=data[2];
         this.free=data[4];
-        cc.log("wallet:update %s %s %f %f",this.type,this.currency,this.amount,this.free);
+        cc.log("bitfinex wallet: %s %s %f %f",this.type,this.currency,this.amount,this.free);
     }
 }
 

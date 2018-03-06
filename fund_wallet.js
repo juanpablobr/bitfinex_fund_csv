@@ -1,9 +1,7 @@
 /**
  * Created by joe on 2018/1/24.
  */
-/**
- * Created by joe on 2017/11/5.
- */
+
 config={};
 fund={};
 logic={};
@@ -23,7 +21,7 @@ require("./logic/fund/walletMgr.js");
 require("./logic/routine.js");
 require("./config.js");
 
-config.apikey=ccsp.config.getFromJson("res/config/apikey.json");
+config.apikey=g_configKey.bitfinex;
 config.server=ccsp.config.getFromJson("res/config/server.json");
 
 

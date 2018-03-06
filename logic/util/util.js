@@ -1,7 +1,7 @@
 /**
  * Created by joe on 2017/11/5.
  */
-util={
+const util={
     //[price,totalAmount,tradeCount]
   calculateAvaragePrice:function (tradeArr) {
       if(!tradeArr || !tradeArr.length)

@@ -21,7 +21,7 @@ require("./logic/fund/walletMgr.js");
 require("./logic/routine.js");
 require("./config.js");
 
-config.apikey=ccsp.config.getFromJson("res/config/apikey.json");
+
 config.server=ccsp.config.getFromJson("res/config/server.json");
 
 g_db = new ccsp.mysql_es6(

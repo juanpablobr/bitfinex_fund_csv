@@ -21,7 +21,7 @@ require("./logic/fund/fundListMgr.js");
 require("./logic/routine.js");
 require("./config.js");
 
-config.apikey=ccsp.config.getFromJson("res/config/apikey.json");
+config.apikey=g_configKey.bitfinex;
 config.server=ccsp.config.getFromJson("res/config/server.json");
 
 
