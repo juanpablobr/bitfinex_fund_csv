@@ -24,7 +24,6 @@ var main=function () {
         for(let i in currencyArr){
             let wallet=new fund.wallet("binance",currencyArr[i],info.balances);
         }
-
     }).catch(e=>{cc.log("error:"+e)});
 };
 

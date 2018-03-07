@@ -44,6 +44,18 @@ class wallet{
         }
     }
 
+    onUpdateHuobipro(dataArr){
+        for(let i=0,m=dataArr.length;i<m;i++){
+            let data=dataArr[i];
+            let currency=data.currency;
+            if(currency!=this.currency)
+                continue;
+            let amount=parseFloat(data.balance);
+            this.amount=amount;
+            cc.log("huobipro wallet: %s %f",currency,amount);
+            break;
+        }
+    }
 
     update(data){
         if(data[0]!==this.type)
