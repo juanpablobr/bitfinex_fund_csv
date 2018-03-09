@@ -126,6 +126,14 @@ var HUOBI_PRO = {
         var payload = sign_sha('GET', URL_HUOBI_PRO, path, body);
         return call_api('GET', path, payload, body);
     },
+    get_history: function(symbol) {
+        var path = `/v1/order/matchresults`;
+        var body = get_body();
+        body.symbol = symbol;
+        body.states = 'submitted,partial-filled';
+        var payload = sign_sha('GET', URL_HUOBI_PRO, path, body);
+        return call_api('GET', path, payload, body);
+    },
     buy_limit: function(symbol, amount, price) {
         var path = '/v1/order/orders/place';
         var body = get_body();
