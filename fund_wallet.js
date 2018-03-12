@@ -26,9 +26,16 @@ config.server=ccsp.config.getFromJson("res/config/server.json");
 
 
 const BFX = require('bitfinex-api-node');
-let bws=new BFX({apiKey:config.apikey.key,apiSecrit:config.apikey.secret,version:2,transform:true}).ws;
-g_bws=bws;
+//let bws=new BFX({apiKey:config.apikey.key,apiSecrit:config.apikey.secret,version:2,transform:true}).ws(2);
 
+let bws=new BFX({apiKey:config.apikey.key,apiSecret:config.apikey.secret,
+    ws: {
+        autoReconnect: true,
+        seqAudit: true,
+        packetWDDelay: 20 * 1000
+    }}).ws();
+
+g_bws=bws;
 
 var main=function () {
     fund.walletMgr.init();
@@ -36,7 +43,9 @@ var main=function () {
     var max=g_currency_array.length;
     var count=0;
 
-    bws.on('auth',()=>{
+
+
+    bws.once('auth',()=>{
         cc.log("authenticated successful!");
         cc.log("auth ok,begin to get wallet info");
         fund.walletMgr.getWalletInfo();
@@ -47,17 +56,13 @@ var main=function () {
     bws.on('open',()=>{
         cc.log("open ok,begin to auth");
         bws.auth();
-        // for(var i in g_currency_array){
-        //     util.monitorFundTrade(g_currency_array[i]);
-        // }
-        // g_fundHistoryMgr.cleanOldData();
     });
 
-
+    //bws.on('open',bws.auth.bind(bws));
 
 
     bws.on('wu', (v) => {
-        //cc.log("wu %s",v[1]);
+        cc.log("wu %s",v[1]);
         var currency=v[1].toLowerCase();
         var type=v[0];
         if(type!=="funding")
@@ -73,6 +78,8 @@ var main=function () {
     });
 
     bws.on('error', console.error);
+
+    bws.open();
 };
 
 main();
