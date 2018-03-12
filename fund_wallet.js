@@ -26,7 +26,7 @@ config.server=ccsp.config.getFromJson("res/config/server.json");
 
 
 const BFX = require('bitfinex-api-node');
-let bws=new BFX(config.apikey.key,config.apikey.secret,{version:2,transform:true}).ws;
+let bws=new BFX({apiKey:config.apikey.key,apiSecrit:config.apikey.secret,version:2,transform:true}).ws;
 g_bws=bws;
 
 
