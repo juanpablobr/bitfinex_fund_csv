@@ -70,26 +70,34 @@ fund.listMgr={
         if(sortFunc)
             infoArr.sort(sortFunc);
         var profit=0;
+        var totalAmount=0;
+        var totalRate=0;
         for(var i in infoArr){
             var info=infoArr[i];
             var dayProfit=info.rate*info.amount*0.85/100;
             profit+=dayProfit;
+            var amount=ccsp.float.getfloat(info.amount,4);
+            totalAmount+=amount;
+            totalRate+=info.rate;
             if(!verbos)
-                cc.log("id %s %s rate %f amount %f expire in %s",info.id,currency,
-                    info.rate,
-                    ccsp.float.getfloat(info.amount,4),
+                cc.log("id %s %s rate %f amount %f expire in %s",info.id,currency,info.rate,amount,
                     ccsp.time.getDuration2(info.expireMS/1000)
                 );
             else
                 cc.log("id %s %s rate %f amount %f expire in %s %s,lend at %s profit %f",info.id,currency,
-                info.rate,
-                ccsp.float.getfloat(info.amount,4),
+                info.rate,amount,
                 ccsp.time.getDuration2(info.expireMS/1000),
                 ccsp.time.getTimeStrFromTimeMS(info.expireTime),
                 ccsp.time.getTimeStrFromTimeMS(info.lendTime),dayProfit
             );
         }
-        cc.log("profit is %f/day predict %f/month %f/year\n",profit,profit*30,profit*30*12);
+
+        var rate=(totalRate/infoArr.length);
+        var rate2=rate*0.85*365/12;
+        cc.log("total %f rate %f rate in profit %f rate factor %f\nprofit is %f/day predict %f/month %f/year\n",
+            ccsp.float.getfloat(totalAmount,2),ccsp.float.getfloat(rate,4),ccsp.float.getfloat(rate*0.85,4),
+            ccsp.float.getfloat(rate2,4),
+            profit,profit*30,profit*30*12);
     },
 
     getDayProfit:function (currency) {
