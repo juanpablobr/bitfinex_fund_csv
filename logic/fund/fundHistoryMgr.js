@@ -1,56 +1,47 @@
 /**
+ * Created by joe on 2018/3/13.
+ */
+/**
  * Created by joe on 2017/11/13.
  */
 class fundHistoryMgr{
-    constructor(currencyArr,cb){
+    constructor(currencyArr){
         this._viewList={};
-        var load=0;
-        var onOK=function(){
-            if(++load<currencyArr.length)
-                return;
-            cb?cb():null;
-        }.bind(this);
+        this._idList={};
         for(var i in currencyArr){
             var currency=currencyArr[i];
-            var timeLimit=ccsp.time.getTimeMS()-24*3600*1000*90;
-            var condition=" time>="+timeLimit;
-            var sort="rate desc";
-            this._viewList[currency]=new ccsp.table_view_list(g_db,currency,condition,sort,onOK);
+            this._viewList[currency]=new ccsp.table_view_list_light(g_db,currency);
+            this._idList[currency]={};
         }
-
     }
 
     getView(currency){
         return this._viewList[currency];
     }
 
-    resortData(currency){
-        var rawArr=this.getView(currency).dump();
-        var newLine=rawArr.pop();
-        var rate=newLine.rate;
-        for(var i=0,l=rawArr.length;i<l;i++){
-            if(rate>=rawArr[i].rate){
-                var otherPart=rawArr.splice(0,i+1);
-                otherPart.push(newLine);
-                this.getView(currency)._data=otherPart.concat(rawArr);
-                return;
-            }
-        }
-        rawArr.push(newLine);
-    }
-
     insert(currency,id,rate,amount,day,time,cb){
         var view=this.getView(currency);
-        if(ccsp.arrayMgr.findIndexOfKV(view.dump(),"id",id)!==null){
+        if(this._idList[currency][id]){
+            cc.log("fundHistoryMgr:%s id %d rate %f amount %f inserting,omit",currency,id,rate,amount);
+            cb?cb():null;
             return;
         }
-        var json={id:id,rate:rate,amount:amount,day:day,time:time};
-        view.dump().push(json);
-        this.resortData(currency);
-
-        view.insert(json,true).then(newID=>{
-            cc.log("fundHistoryMgr:%s id %d inset fund history ok, rate %f amount %f",currency,id,rate,amount);
-            cb?cb():null;
+        this._idList[currency][id]=1;
+        // if(ccsp.arrayMgr.findIndexOfKV(view.dump(),"id",id)!==null){
+        //     return;
+        // }
+        view.get("id="+id).then(v=>{
+            if(v && v.length){
+                cc.log("fundHistoryMgr:%s id %d rate %f amount %f already exists,omit",currency,id,rate,amount);
+                cb?cb():null;
+            }else{
+                var json={id:id,rate:rate,amount:amount,day:day,time:time};
+                //cc.log("begin to insert %s id %d",currency,id);
+                view.insert(json).then(newID=>{
+                    cc.log("fundHistoryMgr:%s id %d inset fund history ok, rate %f amount %f",currency,id,rate,amount);
+                    cb?cb():null;
+                }).catch(()=>{});
+            }
         });
     }
 
@@ -59,29 +50,37 @@ class fundHistoryMgr{
             day=1;
         var curTime=ccsp.time.getTimeMS();
         var begin=curTime-24*3600*day*1000;
-        var data=this.getView(currency).dumpGreaterEqual("time",begin);
-        if(!data || !data.length)
-            return data;
-        if(!rate)
-            return data;
-        return ccsp.arrayMgr.get_greater_equal(data,"rate",rate/100);
+        // var data=this.getView(currency).dumpGreaterEqual("time",begin);
+        // if(!data || !data.length)
+        //     return data;
+        // if(!rate)
+        //     return data;
+        // return ccsp.arrayMgr.get_greater_equal(data,"rate",rate/100);
+
+        var str=ccsp.string.sprintf("time>=%d and rate >=%f",begin,rate);
+        return this.getView(currency).get(str,"order by rate desc");
     }
 
-    getTopRate(currency,max){
+    getTopRate(currency,max,day){
         if(!max)
             max=3;
-        var day=1;
-        //var data=this.getView(currency).dump();
+        if(max>=1000)
+            max=1000;
+        if(!day)
+            day=7;
         var curTime=ccsp.time.getTimeMS();
         var begin=curTime-24*3600*day*1000;
-        var data=this.getView(currency).dumpGreaterEqual("time",begin);
-        var ret=[];
-        for(let i=0;i<max;i++){
-            if(!data[i])
-                break;
-            ret.push(data[i]);
-        }
-        return ret;
+        // var data=this.getView(currency).dumpGreaterEqual("time",begin);
+        // var ret=[];
+        // for(let i=0;i<max;i++){
+        //     if(!data[i])
+        //         break;
+        //     ret.push(data[i]);
+        // }
+        // return ret;
+
+        var str=ccsp.string.sprintf("limit 0,%d",max);
+        return this.getView(currency).getLimit("time>="+begin,"order by rate desc",str);
     }
 
     cleanOldData(day,cb){
@@ -92,13 +91,13 @@ class fundHistoryMgr{
         var time=ccsp.time.getTimeMS()-24*3600*day*1000;
         for(var i in this._viewList){
             this._viewList[i].delByConditionStr("time<"+time).then(
-            function (deleted) {
-                count++;
-                cc.log("fundHistoryMgr:cleanOldData %s history before %d days ok total %d deleted",this,day,deleted);
-                if(count>=max){
-                    cb();
-                }
-            }.bind(i)
+                function (deleted) {
+                    count++;
+                    cc.log("fundHistoryMgr:cleanOldData %s history before %d days ok total %d deleted",this,day,deleted);
+                    if(count>=max){
+                        cb();
+                    }
+                }.bind(i)
             );
         }
 

@@ -44,13 +44,12 @@ g_bws=bws;
 
 var main=function () {
     fund.walletMgr.init();
-    logic.routine.start();
+    // logic.routine.start();
 
     bws.on('auth',()=>{
         cc.log("authenticated successful!");
-        cc.log("auth ok,begin to get wallet info");
+        //cc.log("auth ok,begin to get wallet info");
         fund.walletMgr.getWalletInfo();
-
         // bws.subscribeTrades(['fBTC']);
     });
 
@@ -204,4 +203,7 @@ var main=function () {
     bws.on('error', console.error);
 };
 
-g_fundHistoryMgr=new fund.fundHistoryMgr(g_currency_array,main);
+//g_fundHistoryMgr=new fund.fundHistoryMgr(g_currency_array,main);
+
+g_fundHistoryMgr=new fund.fundHistoryMgr(g_currency_array);
+main();

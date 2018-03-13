@@ -29,7 +29,7 @@ g_db = new ccsp.mysql_es6(
     config.server.db.pass, config.server.db.name, config.server.db.charset,
     config.server.db.conn_max, config.server.db.queue_max
 );
-g_db.test_connection().then(() => cc.log("g_db test ok"), err => {
+g_db.test_connection().then(() => cc.log("mysql connection test ok"), err => {
     cc.log(err);
     process.exit(-1);
 });
@@ -48,22 +48,43 @@ if(!day)
 
 
 
+// var printInfo=function (c,day,rate) {
+//     var lineData=g_fundHistoryMgr.getLatest(c,day,rate);
+//     if(!lineData || !lineData.length) {
+//         lineData = g_fundHistoryMgr.getTopRate(c, 3,day);
+//         cc.log("cannot find give rate in db,return top 3 in last 24hours");
+//         if(!lineData || !lineData.length) {
+//             cc.log("cannot find any data");
+//             return;
+//         }
+//     }
+//
+//     for(var j in lineData){
+//         var data=lineData[j];
+//         cc.log("%s %s rate %f amount %d day %d",ccsp.time.getTimeStrFromTimeMS(data.time),c,
+//             data.rate*100,data.amount,data.day);
+//     }
+// };
+
+
 var printInfo=function (c,day,rate) {
-    var lineData=g_fundHistoryMgr.getLatest(c,day,rate);
-    if(!lineData || !lineData.length) {
-        lineData = g_fundHistoryMgr.getTopRate(c, 3,day);
-        cc.log("cannot find give rate in db,return top 3 in last 24hours");
+    g_fundHistoryMgr.getLatest(c,day,rate).then(lineData=>{
+        if(!lineData || !lineData.length) {
+            cc.log("cannot find give rate in db,return top 10 in last seven days");
+            return g_fundHistoryMgr.getTopRate(c,10,7);
+        }
+        return lineData;
+    }).then(lineData=>{
         if(!lineData || !lineData.length) {
             cc.log("cannot find any data");
             return;
         }
-    }
-
-    for(var j in lineData){
-        var data=lineData[j];
-        cc.log("%s %s rate %f amount %d day %d",ccsp.time.getTimeStrFromTimeMS(data.time),c,
-            data.rate*100,data.amount,data.day);
-    }
+        for(var j in lineData){
+            var data=lineData[j];
+            cc.log("%s %s rate %f amount %f day %f",ccsp.time.getTimeStrFromTimeMS(data.time),c,
+                data.rate*100,data.amount,data.day);
+        }
+    });
 };
 
 var main=function () {
@@ -74,8 +95,7 @@ var main=function () {
     }else{
         printInfo(currency,day,rate);
     }
-    cc.log("end");
-    process.exit(0);
 };
 
-g_fundHistoryMgr=new fund.fundHistoryMgr([currency],main);
+g_fundHistoryMgr=new fund.fundHistoryMgr([currency]);
+main();
