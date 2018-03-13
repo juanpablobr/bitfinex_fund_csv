@@ -84,16 +84,14 @@ var printInfo=function (c,day,rate) {
             cc.log("%s %s rate %f amount %f day %f",ccsp.time.getTimeStrFromTimeMS(data.time),c,
                 data.rate*100,data.amount,data.day);
         }
+        cc.log("end");
+        process.exit(0);
     });
 };
 
 var main=function () {
     cc.log("main:begin");
-    if(!currency){
-        for(var i in g_currency_array){
-            printInfo(g_currency_array[i],day,rate);
-        }
-    }else{
+    if(currency){
         printInfo(currency,day,rate);
     }
 };

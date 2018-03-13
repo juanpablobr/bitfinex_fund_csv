@@ -57,7 +57,7 @@ class fundHistoryMgr{
         //     return data;
         // return ccsp.arrayMgr.get_greater_equal(data,"rate",rate/100);
 
-        var str=ccsp.string.sprintf("time>=%d and rate >=%f",begin,rate);
+        var str=ccsp.string.sprintf("time>=%d and rate >=%f",begin,rate/100);
         return this.getView(currency).get(str,"order by rate desc");
     }
 
