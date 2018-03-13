@@ -43,6 +43,7 @@ g_bws=bws;
 
 
 var main=function () {
+    cc.log("main:begin");
     fund.walletMgr.init();
     // logic.routine.start();
 

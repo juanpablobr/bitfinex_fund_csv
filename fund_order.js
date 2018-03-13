@@ -43,6 +43,7 @@ g_bws=bws;
 
 
 var main=function () {
+    cc.log("main:begin");
     bws.on('auth',()=>{
         cc.log("authenticated successful!");
         // cc.log("open ok,begin to get wallet info");

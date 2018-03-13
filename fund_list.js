@@ -37,7 +37,7 @@ if(verbos==="-v" || sortKey==="-v")
 else
     verbos=false;
 var main=function () {
-
+    cc.log("main:begin");
     bws.on('auth',()=>{
         cc.log("authenticated successful!");
         cc.log("auth ok");

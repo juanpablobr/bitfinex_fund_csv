@@ -41,10 +41,12 @@ if(!day)
     day=1;
 
 var main=function () {
+    cc.log("main:begin");
     g_fundHistoryMgr.cleanOldData(day,function () {
         cc.log("end");
         process.exit(0);
     });
 };
 
-g_fundHistoryMgr=new fund.fundHistoryMgr(g_currency_array,main);
+g_fundHistoryMgr=new fund.fundHistoryMgr(g_currency_array);
+main();

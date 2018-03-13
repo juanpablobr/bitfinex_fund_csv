@@ -88,6 +88,7 @@ var printInfo=function (c,day,rate) {
 };
 
 var main=function () {
+    cc.log("main:begin");
     if(!currency){
         for(var i in g_currency_array){
             printInfo(g_currency_array[i],day,rate);

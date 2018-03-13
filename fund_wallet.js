@@ -40,6 +40,7 @@ let bws=new BFX(config.apikey.key,config.apikey.secret,{version:2,transform:true
 g_bws=bws;
 
 var main=function () {
+    cc.log("main:begin");
     fund.walletMgr.init();
 
     var max=g_currency_array.length;
