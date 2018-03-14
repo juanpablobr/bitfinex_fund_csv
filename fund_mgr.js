@@ -39,7 +39,8 @@ var toRate2=function (v) {
 };
 
 var printUsage=function () {
-    cc.logNoDate("fund_ordermgr usage:\nwallet\norder\ncancel fund_id\nlend currency rate amount (period=30)\n");
+    cc.logNoDate("fund_ordermgr usage:\nwallet\norder\ncancel fund_id\n" +
+        "lend currency rate amount (period=30)\ntrans btc amount toexchange\ntrans btc amount tofund");
 };
 var action=process.argv[2];
 if(action==="wallet"){
@@ -117,9 +118,52 @@ if(action==="wallet"){
     }).catch(err=>{
         cc.log("error:"+err.message);
     });
+}else if(action==="trans"){
+    //trans btc amount trade
+    var currency=process.argv[3];
+    var amount=parseFloat(process.argv[4]);
+    var direction=process.argv[5];
+    if(!currency || !amount || !direction){
+        printUsage();
+        process.exit(0);
+    }
+
+    var walletfrom="";
+    var walletto="";
+    //optional
+    if(direction==="toexchange"){
+        //fund to exchange
+        walletfrom="deposit";
+        walletto="exchange";
+    }else if(direction==="tofund"){
+        //exchange to fund
+        walletfrom="exchange";
+        walletto="deposit";
+    }else{
+        printUsage();
+        process.exit(0);
+    }
+
+
+    var param={
+        currency:currency.toUpperCase(),
+        amount:amount,
+        walletfrom:String(toRate2(rate)),
+        walletto:period,
+    };
+    restClient.transferBetweenWallets(param).then(dataObj=>{
+        cc.log("id %s created",dataObj.id);
+        process.exit(0);
+    }).catch(err=>{
+        cc.log("error:"+err.message);
+    });
 }
-else
-    cc.log("%s not supported yet",action);
+else{
+    if(action)
+        cc.log("%s not supported yet",action);
+    printUsage();
+}
+
 
 // var main=function () {
 //     cc.log("main:begin");
