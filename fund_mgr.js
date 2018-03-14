@@ -39,8 +39,16 @@ var toRate2=function (v) {
 };
 
 var printUsage=function () {
-    cc.logNoDate("fund_ordermgr usage:\nwallet\norder\ncancel fund_id\n" +
-        "lend currency rate amount (period=30)\ntrans btc amount toexchange\ntrans btc amount tofund");
+    cc.logNoDate("fund_ordermgr usage:\n" +
+        "wallet\n" +
+        "order\n" +
+        "cancel fund_id\n" +
+        "lend currency rate amount (period=30)\n" +
+        "trans btc amount [toexchange|tofund]\n" +
+        "exchange\n"+
+        "[buy|sell] eoseth price amount\n" +
+        "replace id price amount\n" +
+        "cancelexchange order_id");
 };
 var action=process.argv[2];
 if(action==="wallet"){
@@ -127,10 +135,8 @@ if(action==="wallet"){
         printUsage();
         process.exit(0);
     }
-
     var walletfrom="";
     var walletto="";
-    //optional
     if(direction==="toexchange"){
         //fund to exchange
         walletfrom="deposit";
@@ -143,16 +149,112 @@ if(action==="wallet"){
         printUsage();
         process.exit(0);
     }
-
-
     var param={
         currency:currency.toUpperCase(),
-        amount:amount,
-        walletfrom:String(toRate2(rate)),
-        walletto:period,
+        amount:String(amount),
+        walletfrom:walletfrom,
+        walletto:walletto,
     };
     restClient.transferBetweenWallets(param).then(dataObj=>{
-        cc.log("id %s created",dataObj.id);
+        if(dataObj.length){
+            cc.log("transfer return:%s",dataObj[0].message);
+        }else{
+            cc.logObj(dataObj);
+        }
+        process.exit(0);
+    }).catch(err=>{
+        cc.log("error:"+err.message);
+    });
+}else if(action==="buy" || action==="sell"){
+    //buy eoseth price amount
+    var pair=process.argv[3];
+    var price=parseFloat(process.argv[4]);
+    var amount=parseFloat(process.argv[5]);
+    if(!pair || !price || !amount){
+        printUsage();
+        process.exit(0);
+    }
+    var param={
+        symbol: pair.toUpperCase(),
+        amount: String(amount/price),
+        price: String(price),
+        exchange: 'bitfinex',
+        side: action,
+        type: 'exchange limit'
+    };
+    restClient.newOrder(param).then(dataObj=>{
+        if(dataObj.order_id){
+            cc.log("%s %s id %s created",action,dataObj.symbol,dataObj.order_id);
+        }else{
+            cc.logObj(dataObj);
+        }
+        process.exit(0);
+    }).catch(err=>{
+        cc.log("error:"+err.message);
+    });
+}else if(action==="replace"){
+    //replace id price amount
+    var id=parseInt(process.argv[3]);
+    var price=parseFloat(process.argv[4]);
+    var amount=parseFloat(process.argv[5]);
+    if(!id || !price || !amount){
+        printUsage();
+        process.exit(0);
+    }
+
+    restClient.getMyOrderStatus({order_id:id}).then(result=>{
+        if(!result.id){
+            cc.logObj(result);
+            process.exit(0);
+            return;
+        }
+        var param={
+            order_id:id,
+            symbol: result.symbol,
+            amount: String(amount/price),
+            price: String(price),
+            exchange: 'bitfinex',
+            side: result.side,
+            type: result.type
+        };
+        restClient.replaceOrder(param).then(dataObj=>{
+            if(dataObj.order_id){
+                cc.log("%s %s id %s->%s updated price %f->%f amount %f->%f",result.side,result.symbol.toLowerCase(),
+                    id,dataObj.order_id,result.price,price,result.original_amount,amount/price);
+            }else{
+                cc.logObj(dataObj);
+            }
+            process.exit(0);
+        }).catch(err=>{
+            cc.log("error:"+err.message);
+        });
+    }).catch(err=>{
+        cc.log("error:"+err.message);
+    });
+}else if(action==="exchange"){
+    restClient.getMyActiveOrders().then(dataArr=>{
+        for(var i=0,l=dataArr.length;i<l;i++){
+            var data=dataArr[i];
+            var id=parseInt(data.id);
+            var symbol=data.symbol.toLowerCase();
+            var price=data.price;
+            var amount=parseFloat(data.original_amount);
+            var okamount=parseFloat(data.executed_amount);
+            var action=data.side;
+            var time=parseInt(data.timestamp);
+            cc.logNoDate("%s id %d %s %s %f(executed:%f) price %f",ccsp.time.getTimeStrFromTime(time),
+                id,action,symbol,amount,okamount,price);
+        }
+        process.exit(0);
+    }).catch(cc.logErr);
+}else if(action==="cancelexchange"){
+    var id=parseInt(process.argv[3]);
+    if(!id){
+        printUsage();
+        process.exit(0);
+    }
+    restClient.cancelOrder({order_id:id}).then(dataObj=>{
+        cc.logNoDate("id %s canceled ok",dataObj.id);
         process.exit(0);
     }).catch(err=>{
         cc.log("error:"+err.message);
