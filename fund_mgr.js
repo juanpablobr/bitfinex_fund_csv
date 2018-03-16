@@ -52,7 +52,8 @@ var printUsage=function () {
         "replace id price amount\n" +
         "cancelexchange order_id\n"+
         "price iotbtc 10\n"+
-            "exchange history btcusd [10]"
+        "exchange history btcusd [10]\n"+
+        "sum or summary"
     );
 };
 var action=process.argv[2];
@@ -269,11 +270,11 @@ if(action==="wallet"){
             for(var i=0,l=dataArr.length;i<l;i++){
                 var data=dataArr[i];
                 var price=parseFloat(data.price);
-                var amount=parseFloat(amount);
+                var amount=parseFloat(data.amount);
                 var fee=parseFloat(data.fee_amount);
                 var action=data.type;
                 var time=parseInt(data.timestamp);
-                cc.logNoDate("%s %s %s price %f amount %f fee %f",ccsp.time.getTimeStrFromTime(time),
+                cc.logNoDate("%s %s %s price %010f amount %f fee %f",ccsp.time.getTimeStrFromTime(time),
                     action,pair,price,amount,fee);
             }
             process.exit(0);
@@ -309,6 +310,9 @@ if(action==="wallet"){
         param.limit_trades=limit;
     }
     restClient.getTradeHistory(pair,param).then(dataArr=>{
+        dataArr.sort(function (a,b) {
+            return parseFloat(a.amount)-parseFloat(b.amount);
+        });
         for(var i=0,l=dataArr.length;i<l;i++){
             var data=dataArr[i];
             var price=parseFloat(data.price);
@@ -317,6 +321,21 @@ if(action==="wallet"){
             var time=parseInt(data.timestamp);
             cc.logNoDate("%s %s %s price %f amount %f",ccsp.time.getTimeStrFromTime(time),
                 action,pair,price,amount);
+        }
+        process.exit(0);
+    }).catch(err=>{
+        cc.log("error:"+err.message);
+    });
+}else if(action==="summary" || action==="sum"){
+    restClient.getSummary(pair,param).then(dataArr=>{
+        var dataArr=dataArr.funding_profit_30d;
+        for(var i=0,l=dataArr.length;i<l;i++){
+            var data=dataArr[i];
+            var amount=parseFloat(data.amount);
+            var currency=data.curr;
+            if(!amount)
+                continue;
+            cc.logNoDate("%s profit %f",currency.toLowerCase(),amount);
         }
         process.exit(0);
     }).catch(err=>{
