@@ -24,6 +24,8 @@ require("./config.js");
 config.apikey=g_configKey.bitfinex;
 config.server=ccsp.config.getFromJson("res/config/server.json");
 
+//https://github.com/mjesuele/bitfinex-api-node/
+
 //import BitfinexAPI from 'bitfinex-api';
 const BitfinexAPI=require("bitfinex-api").default;
 const restClient = new BitfinexAPI({ key:config.apikey.key, secret:config.apikey.secret });
@@ -45,10 +47,14 @@ var printUsage=function () {
         "cancel fund_id\n" +
         "lend currency rate amount (period=30)\n" +
         "trans btc amount [toexchange|tofund]\n" +
-        "exchange\n"+
+        "exchange list\n"+
         "[buy|sell] eoseth price amount\n" +
         "replace id price amount\n" +
-        "cancelexchange order_id");
+        "cancelexchange order_id\n"+
+        "price iotbtc 10\n"+
+        "exchange history btcusd [10]\n"+
+        "sum or summary"
+    );
 };
 var action=process.argv[2];
 if(action==="wallet"){
@@ -232,21 +238,54 @@ if(action==="wallet"){
         cc.log("error:"+err.message);
     });
 }else if(action==="exchange"){
-    restClient.getMyActiveOrders().then(dataArr=>{
-        for(var i=0,l=dataArr.length;i<l;i++){
-            var data=dataArr[i];
-            var id=parseInt(data.id);
-            var symbol=data.symbol.toLowerCase();
-            var price=data.price;
-            var amount=parseFloat(data.original_amount);
-            var okamount=parseFloat(data.executed_amount);
-            var action=data.side;
-            var time=parseInt(data.timestamp);
-            cc.logNoDate("%s id %d %s %s %f(executed:%f) price %f",ccsp.time.getTimeStrFromTime(time),
-                id,action,symbol,amount,okamount,price);
+    if(process.argv[3]==="list"){
+        restClient.getMyActiveOrders().then(dataArr=>{
+            for(var i=0,l=dataArr.length;i<l;i++){
+                var data=dataArr[i];
+                var id=parseInt(data.id);
+                var symbol=data.symbol.toLowerCase();
+                var price=data.price;
+                var amount=parseFloat(data.original_amount);
+                var okamount=parseFloat(data.executed_amount);
+                var action=data.side;
+                var time=parseInt(data.timestamp);
+                cc.logNoDate("%s id %d %s %s %f(executed:%f) price %f",ccsp.time.getTimeStrFromTime(time),
+                    id,action,symbol,amount,okamount,price);
+            }
+            process.exit(0);
+        }).catch(cc.logErr);
+    }else if(process.argv[3]==="history"){
+        var pair=process.argv[4];
+        var limit=parseInt(process.argv[5]);
+        if(!pair){
+            printUsage();
+            process.exit(0);
         }
+        var param={};
+        param.symbol=pair;
+        if(limit){
+            param.limit_trades=limit;
+        }
+        restClient.getMyPastTrades(param).then(dataArr=>{
+            for(var i=0,l=dataArr.length;i<l;i++){
+                var data=dataArr[i];
+                var price=parseFloat(data.price);
+                var amount=parseFloat(data.amount);
+                var fee=parseFloat(data.fee_amount);
+                var action=data.type;
+                var time=parseInt(data.timestamp);
+                cc.logNoDate("%s %s %s price %010f amount %f fee %f",ccsp.time.getTimeStrFromTime(time),
+                    action,pair,price,amount,fee);
+            }
+            process.exit(0);
+        }).catch(err=>{
+            cc.log("error:"+err);
+            cc.logObj(err);
+        });
+    }else{
+        printUsage();
         process.exit(0);
-    }).catch(cc.logErr);
+    }
 }else if(action==="cancelexchange"){
     var id=parseInt(process.argv[3]);
     if(!id){
@@ -255,6 +294,49 @@ if(action==="wallet"){
     }
     restClient.cancelOrder({order_id:id}).then(dataObj=>{
         cc.logNoDate("id %s canceled ok",dataObj.id);
+        process.exit(0);
+    }).catch(err=>{
+        cc.log("error:"+err.message);
+    });
+}else if(action==="price"){
+    var pair=process.argv[3];
+    var limit=parseInt(process.argv[4]);
+    if(!pair){
+        printUsage();
+        process.exit(0);
+    }
+    param={};
+    if(limit){
+        param.limit_trades=limit;
+    }
+    restClient.getTradeHistory(pair,param).then(dataArr=>{
+        dataArr.sort(function (a,b) {
+            return parseFloat(a.amount)-parseFloat(b.amount);
+        });
+        for(var i=0,l=dataArr.length;i<l;i++){
+            var data=dataArr[i];
+            var price=parseFloat(data.price);
+            var amount=parseFloat(data.amount);
+            var action=data.type;
+            var time=parseInt(data.timestamp);
+            cc.logNoDate("%s %s %s price %f amount %f",ccsp.time.getTimeStrFromTime(time),
+                action,pair,price,amount);
+        }
+        process.exit(0);
+    }).catch(err=>{
+        cc.log("error:"+err.message);
+    });
+}else if(action==="summary" || action==="sum"){
+    restClient.getSummary(pair,param).then(dataArr=>{
+        var dataArr=dataArr.funding_profit_30d;
+        for(var i=0,l=dataArr.length;i<l;i++){
+            var data=dataArr[i];
+            var amount=parseFloat(data.amount);
+            var currency=data.curr;
+            if(!amount)
+                continue;
+            cc.logNoDate("%s profit %f",currency.toLowerCase(),amount);
+        }
         process.exit(0);
     }).catch(err=>{
         cc.log("error:"+err.message);
