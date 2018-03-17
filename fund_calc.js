@@ -20,6 +20,13 @@ require("./logic/fund/walletMgr.js");
 
 require("./logic/routine.js");
 
+
+// var time=ccsp.time.getTimeMS();
+// var time2=time-18*3600*1000;
+// var time3=ccsp.time.mkTimeMS(2018,3,17,0,18,44);
+// cc.logNoDate("%s %f",ccsp.time.getTimeStrFromTimeMS(time2),time2);
+// cc.logNoDate("%s %f",ccsp.time.getTimeStrFromTimeMS(time3),time3);
+// return;
 // var maxDay=365*3;
 // var diffDay=13;
 // var diffRate=0.06;
