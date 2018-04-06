@@ -44,7 +44,7 @@ var printUsage=function () {
     cc.logNoDate("fund_ordermgr usage:\n" +
         "wallet\n" +
         "order\n" +
-        "cancel fund_id\n" +
+        "cancel fund_id1 [... fund_id]\n" +
         "lend currency rate amount (period=30)\n" +
         "trans btc amount [toexchange|tofund]\n" +
         "exchange list\n"+
@@ -56,6 +56,17 @@ var printUsage=function () {
         "sum or summary"
     );
 };
+
+var cancelOffer=function (id,cb) {
+    restClient.cancelOffer({offer_id:id}).then(dataObj=>{
+        cc.logNoDate("id %s canceled ok",dataObj.id);
+        cb?cb():null;
+    }).catch(err=>{
+        cc.log("error:"+err.message);
+        cb?cb(err):null;
+    });
+};
+
 var action=process.argv[2];
 if(action==="wallet"){
     restClient.getWalletBalances().then(dataArr=>{
@@ -98,12 +109,19 @@ if(action==="wallet"){
         printUsage();
         process.exit(0);
     }
-    restClient.cancelOffer({offer_id:id}).then(dataObj=>{
-        cc.logNoDate("id %s canceled ok",dataObj.id);
-        process.exit(0);
-    }).catch(err=>{
-        cc.log("error:"+err.message);
-    });
+    var num=process.argv.length-3;
+    var loop=0;
+
+    var id=parseInt(process.argv[3+loop]);
+    var onCancelCB=function () {
+        loop++;
+        if(loop>=num){
+            process.exit(0);
+        }
+        var id=parseInt(process.argv[3+loop]);
+        cancelOffer(id,onCancelCB);
+    }.bind(this);
+    cancelOffer(id,onCancelCB);
 }else if(action==="lend"){
     //must
     var currency=process.argv[3];
