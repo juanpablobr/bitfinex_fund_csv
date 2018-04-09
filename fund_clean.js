@@ -38,7 +38,7 @@ g_db.test_connection().then(() => cc.log("g_db test ok"), err => {
 var day=parseFloat(process.argv[2]);
 
 if(!day)
-    day=1;
+    day=7;
 
 var main=function () {
     cc.log("main:begin");
