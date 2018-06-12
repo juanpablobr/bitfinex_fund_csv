@@ -32,6 +32,8 @@ fund.listMgr={
             var info={};
             info.id=order[0];
             info.rate=order[19]*100;
+            if(!info.rate)
+                info.rate=order[11]*100;
             info.amount=order[5];
             info.day=order[12];
             info.lendTime=order[13];
