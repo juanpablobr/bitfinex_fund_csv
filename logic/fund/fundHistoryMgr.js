@@ -38,7 +38,7 @@ class fundHistoryMgr{
                 var json={id:id,rate:rate,amount:amount,day:day,time:time};
                 //cc.log("begin to insert %s id %d",currency,id);
                 view.insert(json).then(newID=>{
-                    cc.log("fundHistoryMgr:%s id %d inset fund history ok, rate %f amount %f",currency,id,rate,amount);
+                    //cc.log("fundHistoryMgr:%s id %d inset fund history ok, rate %f amount %f",currency,id,rate,amount);
                     cb?cb():null;
                 }).catch(()=>{});
             }
